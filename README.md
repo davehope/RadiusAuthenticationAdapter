@@ -5,6 +5,8 @@ AD FS Authentication Adapter for RADIUS.
 
 The typical use case is likely to be sending a PIN/Token, provided by an end user, off to a RADIUS server.
 
+![readme](https://cloud.githubusercontent.com/assets/5435716/22159558/69e37410-df39-11e6-8349-8584fd0bc0d5.png)
+
 ## Requirements
 - .NET 4.5
 
