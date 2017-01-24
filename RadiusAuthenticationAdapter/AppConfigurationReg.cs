@@ -14,26 +14,79 @@ namespace RadiusAuthenticationAdapter
             { 
                 if (appConfig != null)
                 {
-                    _Server = appConfig.GetValue("Server").ToString();
-
-                    if (! uint.TryParse(appConfig.GetValue("AuthenticationPort").ToString(), out _AuthenticationPort))
+                    // RADIUS Server - Required value.
+                    var regServer = appConfig.GetValue("Server");
+                    if (regServer != null)
                     {
-                        _AuthenticationPort = 1812;
+                        _Server = regServer.ToString();
+                    }
+                    else
+                    {
+                        Logging.LogMessage("Configuration data invalid - Missing Server");
+                        throw new Exception("Configuration data not found.");
                     }
 
-                    if (! uint.TryParse(appConfig.GetValue("AccountingPort").ToString(), out _AccountingPort))
+
+                    // RADIUS Authentication Port - Optional value.
+                    var regAuthenticationPort = appConfig.GetValue("AuthenticationPort");
+                    if (regAuthenticationPort != null)
                     {
-                        _AccountingPort = 1813;
+                        if (!uint.TryParse(regAuthenticationPort.ToString(), out _AuthenticationPort))
+                        {
+                            _AuthenticationPort = 1812;
+                        }
                     }
 
-                    if (! int.TryParse(appConfig.GetValue("TimeOut").ToString(), out _TimeOut))
+
+                    // RADIUS Accounting Port - Optional value.
+                    var regAccountingPort = appConfig.GetValue("AccountingPort");
+                    if (regAccountingPort != null)
+                    {
+                        if (!uint.TryParse(regAccountingPort.ToString(), out _AccountingPort))
+                        {
+                            _AccountingPort = 1813;
+                        }
+                    }
+
+
+                    // RADIUS Timeout - Optional value.
+                    var regTimeOut = appConfig.GetValue("TimeOut");
+                    if (regTimeOut != null)
+                    {
+                        if (!int.TryParse(regTimeOut.ToString(), out _TimeOut))
+                        {
+                            _TimeOut = 3000;
+                        }
+                    }
+                    else
                     {
                         _TimeOut = 3000;
                     }
 
-                    _SharedSecret = appConfig.GetValue("SharedSecret").ToString();
 
-                    if(! bool.TryParse(appConfig.GetValue("Debug").ToString(), out _Debug))
+                    // RADIUS Shared Secret - Required value.
+                    var regSharedSecret = appConfig.GetValue("SharedSecret");
+                    if( regSharedSecret != null )
+                    {
+                        _SharedSecret = regSharedSecret.ToString();
+                    }
+                    else
+                    {
+                        Logging.LogMessage("Configuration data invalid - Missing SharedSecret");
+                        throw new Exception("Configuration data not found.");
+                    }
+
+
+                    // Debug Setting - Optional value.
+                    var regDebug = appConfig.GetValue("Debug");
+                    if( regDebug != null )
+                    {
+                        if (!bool.TryParse(regDebug.ToString(), out _Debug))
+                        {
+                            _Debug = false;
+                        }
+                    }
+                    else
                     {
                         _Debug = false;
                     }

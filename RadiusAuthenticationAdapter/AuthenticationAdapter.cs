@@ -9,7 +9,7 @@ namespace RadiusAuthenticationAdapter
     {
         private RadiusClient radiusClient;
         private string userPrincipalName;
-        private Boolean debugLogging = false;
+        private bool debugLogging = false;
 
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace RadiusAuthenticationAdapter
         public IAdapterPresentation OnError(System.Net.HttpListenerRequest request, ExternalAuthenticationException ex)
         {
             Logging.LogMessage(
-                "An error occured authenticating the user." +
+                "An error occured authenticating a user." + Environment.NewLine + Environment.NewLine +
                 "Username: " + this.userPrincipalName + Environment.NewLine +
                 "Error: " + ex.Message);
 
