@@ -16,6 +16,8 @@ New-ItemProperty -Path "HKLM:\SOFTWARE\Dave Hope\RadiusAuthenticationAdapter" -N
 Write-Host "Copying files to $env:programfiles"
 New-Item -ItemType Directory "$env:programfiles\Dave Hope\RadiusAuthenticationAdapter" | Out-Null
 Copy-Item RadiusAuthenticationAdapter.dll "$env:programfiles\Dave Hope\RadiusAuthenticationAdapter" | Out-Null
+New-Item -ItemType Directory "$env:programfiles\Dave Hope\RadiusAuthenticationAdapter\nl" | Out-Null
+Copy-Item nl\RadiusAuthenticationAdapter.resources.dll "$env:programfiles\Dave Hope\nl\RadiusAuthenticationAdapter.resources.dll" | Out-Null
 Copy-Item Radius.dll "$env:programfiles\Dave Hope\RadiusAuthenticationAdapter" | Out-Null
 Set-location "$env:programfiles\Dave Hope\RadiusAuthenticationAdapter"
 
@@ -41,7 +43,7 @@ $response = read-host
 if ( $response -ne "Y" )
 {
 	Write-Host "Aborted"
-	exit	
+	exit
 }
 
 
