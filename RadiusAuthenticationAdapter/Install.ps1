@@ -9,6 +9,7 @@ New-ItemProperty -Path "HKLM:\SOFTWARE\Dave Hope\RadiusAuthenticationAdapter" -N
 New-ItemProperty -Path "HKLM:\SOFTWARE\Dave Hope\RadiusAuthenticationAdapter" -Name "AccountingPort" -Value "1813" | Out-Null
 New-ItemProperty -Path "HKLM:\SOFTWARE\Dave Hope\RadiusAuthenticationAdapter" -Name "TimeOut" -Value "3000" | Out-Null
 New-ItemProperty -Path "HKLM:\SOFTWARE\Dave Hope\RadiusAuthenticationAdapter" -Name "SharedSecret" -Value "password" | Out-Null
+New-ItemProperty -Path "HKLM:\SOFTWARE\Dave Hope\RadiusAuthenticationAdapter" -Name "IdentityClaims" -Value "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn" | Out-Null
 
 #
 # Copy files to the right locations
@@ -21,7 +22,7 @@ Set-location "$env:programfiles\Dave Hope\RadiusAuthenticationAdapter"
 #
 # Install assemblies into GAC.
 Write-Host "Installing assemblies into the GAC"
-[System.Reflection.Assembly]::Load("System.EnterpriseServices, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a") | Out-Null
+Add-Type -AssemblyName System.EnterpriseServices
 $publish = New-Object System.EnterpriseServices.Internal.Publish
 $publish.GacInstall("$env:programfiles\Dave Hope\RadiusAuthenticationAdapter\Radius.dll")
 $publish.GacInstall("$env:programfiles\Dave Hope\RadiusAuthenticationAdapter\RadiusAuthenticationAdapter.dll")
@@ -46,5 +47,5 @@ if ( $response -ne "Y" )
 
 #
 # Register AD:FS Authentication Adapter
-$typeName = "RadiusAuthenticationAdapter.AuthenticationAdapter, RadiusAuthenticationAdapter, Version=1.0.0.0, Culture=neutral, PublicKeyToken=7be220675eadd64f"
-Register-AdfsAuthenticationProvider -TypeName $typeName -Name "RadiusAuthenticationAdapter" -Verbose
+$typeName = ([system.reflection.assembly]::loadfile("$env:programfiles\Dave Hope\RadiusAuthenticationAdapter\RadiusAuthenticationAdapter.dll")).FullName
+Register-AdfsAuthenticationProvider -TypeName "RadiusAuthenticationAdapter.AuthenticationAdapter, $typeName" -Name "RadiusAuthenticationAdapter" -Verbose

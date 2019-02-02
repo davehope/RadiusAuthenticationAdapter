@@ -19,7 +19,7 @@ namespace RadiusAuthenticationAdapter.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -70,7 +70,7 @@ namespace RadiusAuthenticationAdapter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Unable to authenticate - Chellenge Required.
+        ///   Looks up a localized string similar to Unable to authenticate - Challenge Required.
         /// </summary>
         public static string Error_RADIUS_ACCESS_CHALLENGE {
             get {
@@ -97,7 +97,7 @@ namespace RadiusAuthenticationAdapter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to RADIUS Authentication Adapter.
+        ///   Looks up a localized string similar to SafeNet RADIUS Authentication.
         /// </summary>
         public static string Metadata_AdminName {
             get {
@@ -106,7 +106,7 @@ namespace RadiusAuthenticationAdapter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Token PIN Required.
+        ///   Looks up a localized string similar to PIN Token Required.
         /// </summary>
         public static string Presentation_PageTitle {
             get {
@@ -115,7 +115,7 @@ namespace RadiusAuthenticationAdapter.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Token and PIN.
+        ///   Looks up a localized string similar to PIN + Token.
         /// </summary>
         public static string Presentation_Prompt {
             get {

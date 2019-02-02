@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RadiusAuthenticationAdapter
+﻿namespace RadiusAuthenticationAdapter
 {
     /// <summary>
     /// This class acts as a basis for configuration, from which derived classes can implement different configuration backends.
@@ -40,6 +38,20 @@ namespace RadiusAuthenticationAdapter
         {
             get { return _SharedSecret; }
             set { _SharedSecret = value; }
+        }
+
+        internal string _IdentityClaims;
+        public string IdentityClaims
+        {
+            get { return _IdentityClaims; }
+            set { _IdentityClaims = value; }
+        }
+
+        internal string _NasAddress;
+        public string NasAddress
+        {
+            get { return _NasAddress; }
+            set { _NasAddress = value; }
         }
 
         internal bool _Debug;

@@ -23,7 +23,7 @@ namespace RadiusAuthenticationAdapter
                     else
                     {
                         Logging.LogMessage("Configuration data invalid - Missing Server");
-                        throw new Exception("Configuration data not found.");
+                        throw new Exception("Configuration data not found (Server).");
                     }
 
 
@@ -89,6 +89,27 @@ namespace RadiusAuthenticationAdapter
                     else
                     {
                         _Debug = false;
+                    }
+
+                    var regIdentityClaims = appConfig.GetValue("IdentityClaims");
+                    if (regIdentityClaims != null)
+                    {
+                        _IdentityClaims = regIdentityClaims.ToString();
+                    }
+                    else
+                    {
+                        Logging.LogMessage("Configuration data invalid - Missing IdentityClaims");
+                        throw new Exception("Configuration data not found (IdentityClaims).");
+                    }
+
+                    var regNasAddress = appConfig.GetValue("NasAddress");
+                    if (regNasAddress != null)
+                    {
+                        _NasAddress = regNasAddress.ToString();
+                    }
+                    else
+                    {
+                        _NasAddress = String.Empty;
                     }
                 }
                 else

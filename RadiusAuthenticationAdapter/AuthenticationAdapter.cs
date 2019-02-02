@@ -1,16 +1,19 @@
 ﻿using System;
 using Microsoft.IdentityServer.Web.Authentication.External;
-using RadiusAuthenticationAdapter.Properties;
 using FP.Radius;
+using System.Net;
+using RadiusAuthenticationAdapter.Properties;
+using System.Resources;
 
 namespace RadiusAuthenticationAdapter
 {
     class AuthenticationAdapter : IAuthenticationAdapter
     {
         private RadiusClient radiusClient;
-        private string userPrincipalName;
+        private string identityClaim;
         private bool debugLogging = false;
-
+        private AppConfigurationReg appConfig;
+        static ResourceManager resMgr = Resources.ResourceManager;
 
         /// <summary>
         /// Called once AD FS decides that MFA is required for a user.
@@ -22,7 +25,7 @@ namespace RadiusAuthenticationAdapter
         public IAdapterPresentation BeginAuthentication(System.Security.Claims.Claim identityClaim, System.Net.HttpListenerRequest request, IAuthenticationContext context)
         {
             // This is needed so we can access the UPN in TryEndAuthentication().
-            this.userPrincipalName = identityClaim.Value;
+            this.identityClaim = identityClaim.Value;
 
             return new AdapterPresentation();
         }
@@ -45,10 +48,7 @@ namespace RadiusAuthenticationAdapter
         /// <summary>
         /// Used by ADFS to learn about this Authentication Provider.
         /// </summary>
-        public IAuthenticationAdapterMetadata Metadata
-        {
-            get { return new AuthenticationAdapterMetadata(); }
-        }
+        public IAuthenticationAdapterMetadata Metadata => new AuthenticationAdapterMetadata();
 
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace RadiusAuthenticationAdapter
         /// <param name="configData"></param>
         public void OnAuthenticationPipelineLoad(IAuthenticationMethodConfigData configData)
         {
-            var appConfig = new AppConfigurationReg();
+            appConfig = new AppConfigurationReg();
             radiusClient = new RadiusClient(appConfig.Server, appConfig.SharedSecret, appConfig.TimeOut,
                appConfig.AuthenticationPort, appConfig.AccountingPort);
 
@@ -97,7 +97,7 @@ namespace RadiusAuthenticationAdapter
         {
             Logging.LogMessage(
                 "An error occured authenticating a user." + Environment.NewLine + Environment.NewLine +
-                "Username: " + this.userPrincipalName + Environment.NewLine +
+                "Username: " + this.identityClaim + Environment.NewLine +
                 "Error: " + ex.Message);
 
             return new AdapterPresentation(ex.Message, true);
@@ -126,14 +126,20 @@ namespace RadiusAuthenticationAdapter
             {
                 if (this.debugLogging)
                 {
-                    Logging.LogMessage("Either proffData is null or does not contain required property");
+                    Logging.LogMessage("Either proofData is null or does not contain required property");
                 }
-                throw new ExternalAuthenticationException(Resources.Error_InvalidPIN, context);
+                throw new ExternalAuthenticationException(resMgr.GetString("Error_InvalidPIN", new System.Globalization.CultureInfo(context.Lcid)), context);
             }
             string pin = proofData.Properties["pin"].ToString();
+            string userName = this.identityClaim;
 
             // Construct RADIUS auth request.
-            var authPacket = radiusClient.Authenticate(this.userPrincipalName, pin);
+            var authPacket = radiusClient.Authenticate(userName, pin);
+            if (!String.IsNullOrEmpty(appConfig.NasAddress))
+            {
+                byte[] bIP = IPAddress.Parse(appConfig.NasAddress).GetAddressBytes();
+                authPacket.SetAttribute(new RadiusAttribute(RadiusAttributeType.NAS_IP_ADDRESS, bIP));
+            }
             var receivedPacket = radiusClient.SendAndReceivePacket(authPacket).Result;
 
             // Handle no response from RADIUS server.
@@ -143,7 +149,7 @@ namespace RadiusAuthenticationAdapter
                 {
                     Logging.LogMessage("No response received from RADIUS server.");
                 }
-                throw new ExternalAuthenticationException(Resources.Error_RADIUS_NULL, context);
+                throw new ExternalAuthenticationException(resMgr.GetString("Error_RADIUS_NULL", new System.Globalization.CultureInfo(context.Lcid)), context);
             }
 
             // Examine the different RADIUS responses
@@ -155,13 +161,13 @@ namespace RadiusAuthenticationAdapter
                     break;
                 case RadiusCode.ACCESS_CHALLENGE:
                     // No way to cater for this. Fail.
-                    result = new AdapterPresentation(Resources.Error_RADIUS_ACCESS_CHALLENGE, false);
+                    result = new AdapterPresentation(resMgr.GetString("Error_RADIUS_ACCESS_CHALLENGE", new System.Globalization.CultureInfo(context.Lcid)), false);
                     break;
                 case RadiusCode.ACCESS_REJECT:
-                    result = new AdapterPresentation(Resources.Error_InvalidPIN, false);
+                    result = new AdapterPresentation(resMgr.GetString("Error_InvalidPIN", new System.Globalization.CultureInfo(context.Lcid)), false);
                     break;
                 default:
-                    result = new AdapterPresentation(Resources.Error_RADIUS_OTHER, false);
+                    result = new AdapterPresentation(resMgr.GetString("Error_RADIUS_OTHER", new System.Globalization.CultureInfo(context.Lcid)), false);
                     break;
             }
 
@@ -170,7 +176,7 @@ namespace RadiusAuthenticationAdapter
                 Logging.LogMessage(
                     "Processed authentication response." + Environment.NewLine +
                     "Packet Type: " + receivedPacket.PacketType.ToString() + Environment.NewLine +
-                    "User: " + this.userPrincipalName );
+                    "User: " + this.identityClaim );
             }
 
             return result;
